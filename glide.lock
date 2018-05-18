@@ -1,0 +1,16 @@
+hash: 807ba43118479173314b8a5f9026935833d075a67adef281740d7c6a674f5d4f
+updated: 2018-05-18T10:10:02.43879+07:00
+imports:
+- name: github.com/jung-kurt/gofpdf
+  version: 14c1db30737a138f8d9797cffea58783892b2fae
+- name: github.com/k0kubun/pp
+  version: e057ee7a28277be4d2af303443b6da377768181f
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: golang.org/x/sys
+  version: 062cd7e4e68206d8bab9b18396626e855c992658
+  subpackages:
+  - unix
+testImports: []

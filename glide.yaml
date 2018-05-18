@@ -1,0 +1,4 @@
+package: github.com/minhluuquang/image-pdf-gen
+import:
+- package: github.com/jung-kurt/gofpdf
+  version: v1.0.0

@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -14,65 +13,71 @@ import (
 	"github.com/k0kubun/pp"
 )
 
+type filesPath []string
+
+func (i *filesPath) String() string {
+	return "list string"
+}
+
+func (i *filesPath) Set(value string) error {
+	pp.Println(value)
+	*i = strings.Split(value, ",")
+	return nil
+}
+
 func main() {
 	var err error
-	count := 0
-	dir := flag.String("dir", "", "path to the directory contains your images")
-	out := flag.String("out", "", "path to output pdf file")
+	var files []string
+	var out string
 
-	flag.Parse()
+	if os.Args[1] != "-files" {
+		pp.Println("Use flag -files path1 path2...")
+		os.Exit(1)
+	}
+
+	for i := 2; i < len(os.Args) && os.Args[i] != "-out"; i++ {
+		files = append(files, os.Args[i])
+	}
 
 	// start a new pdf file
 	pdfFile := gofpdf.New("P", "mm", "A4", "")
 
-	// if dir is not provide we use current directory
-	if *dir == "" {
-		*dir, err = os.Getwd()
+	if len(files) <= 0 {
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
+	for i, arg := range os.Args {
+		if arg == "-out" && i+1 < len(os.Args) {
+			out = os.Args[i+1]
+			break
+		}
+		out, err = os.Getwd()
 		if err != nil {
 			pp.Fatal(err)
 		}
 	}
 
-	if *out == "" {
-		*out, err = os.Getwd()
-		if err != nil {
-			pp.Fatal(err)
-		}
-	}
-
-	filesOfDir, err := ioutil.ReadDir(*dir)
-	if err != nil {
-		pp.Fatal(err)
-	}
-
-	pp.Printf("Processing file in directory %s\n", *dir)
-	for _, f := range filesOfDir {
-		filename := f.Name()
-		matched, err := regexp.MatchString(`\.png$|\.jpg$|\.svg$|\.jpeg$`, filename)
+	for _, f := range files {
+		matched, err := regexp.MatchString(`\.png$|\.jpg$|\.svg$|\.jpeg$`, f)
 		if err != nil {
 			pp.Fatal(err)
 		}
 		if matched {
-			count++
-			ext := path.Ext(filename)
+			ext := path.Ext(f)
 			if ext == ".jpeg" {
 				ext = ".jpg"
 			}
 			ext = strings.Replace(ext, ".", "", 1)
-			pp.Printf("Adding: %s\n", filename)
+			pp.Printf("Adding: %s\n", f)
 			pdfFile.AddPage()
-			pdfFile.ImageOptions(filepath.Join(*dir, filename), 0, 0, 0, 0, false, gofpdf.ImageOptions{ImageType: ext}, 0, "")
+			pdfFile.ImageOptions(f, 0, 0, 0, 0, false, gofpdf.ImageOptions{ImageType: ext}, 0, "")
 		}
 	}
 
-	if count == 0 {
-		pp.Printf("There is no images in this directory\n")
-		os.Exit(0)
-	}
-
-	err = pdfFile.OutputFileAndClose(filepath.Join(*out, "output.pdf"))
+	err = pdfFile.OutputFileAndClose(filepath.Join(out, "output.pdf"))
 	if err != nil {
 		pp.Fatal(err)
 	}
-	pp.Printf("Generated output to: %s\n", *out)
+	pp.Printf("Generated output to: %s\n", out)
 }

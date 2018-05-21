@@ -19,4 +19,4 @@ https://golang.org/doc/install
 
 ## Usage
 
-```image-pdf-gen -dir path_to_dir_contains_images -o path_to_dir_contains_pdf```
+```image-pdf-gen -files path_to_images_1 path_to_images_2 -out path_of_output_file```
